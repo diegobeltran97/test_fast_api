@@ -55,7 +55,7 @@
                 ? "https://test-fast-api-q3vr.onrender.com"
                 : "http://127.0.0.1:8000";
 
-            let response = await fetch("http://127.0.0.1:8000/upload/", {
+            let response = await fetch(`${API_BASE_URL}`, {
                 method: "POST",
                 body: formData
             });
