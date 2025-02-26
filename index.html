@@ -50,6 +50,11 @@
             let formData = new FormData();
             formData.append("file", file);
 
+            // Set the API base URL dynamically (from env variable or default)
+            const API_BASE_URL = window.location.hostname.includes("onrender.com")
+                ? "https://test-fast-api-q3vr.onrender.com"
+                : "http://127.0.0.1:8000";
+
             let response = await fetch("http://127.0.0.1:8000/upload/", {
                 method: "POST",
                 body: formData
