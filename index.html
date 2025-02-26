@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculador de Horas Trabajadas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-900 flex justify-center items-center min-h-screen">
+
+    <div class="w-full max-w-3xl bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold text-center mb-4">Subir Archivo Excel</h2>
+
+        <form id="uploadForm" class="flex flex-col items-center">
+            <input type="file" id="fileInput" accept=".xls,.xlsx" class="mb-4 p-2 border rounded-lg w-full" required>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                Subir Archivo
+            </button>
+        </form>
+
+        <div id="result" class="mt-6 hidden">
+            <h3 class="text-xl font-semibold mb-3">Horas Trabajadas</h3>
+            <table class="w-full border-collapse border border-gray-300 shadow-sm">
+                <thead>
+                    <tr class="bg-blue-500 text-white">
+                        <th class="border border-gray-300 px-4 py-2">Nombre</th>
+                        <th class="border border-gray-300 px-4 py-2">Fecha</th>
+                        <th class="border border-gray-300 px-4 py-2">Día de la Semana</th>
+                        <th class="border border-gray-300 px-4 py-2">Horas Trabajadas</th>
+                    </tr>
+                </thead>
+                <tbody id="resultBody" class="bg-white text-center"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("uploadForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            let fileInput = document.getElementById("fileInput");
+            let file = fileInput.files[0];
+            if (!file) {
+                alert("Selecciona un archivo");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("file", file);
+
+            let response = await fetch("http://127.0.0.1:8000/upload/", {
+                method: "POST",
+                body: formData
+            });
+
+            let result = await response.json();
+
+            if (result.hours_worked && result.hours_worked.data) {
+                let tableBody = document.getElementById("resultBody");
+                tableBody.innerHTML = "";
+
+                result.hours_worked.data.forEach(row => {
+                    let tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td class="border border-gray-300 px-4 py-2">${row.Nombre}</td>
+                        <td class="border border-gray-300 px-4 py-2">${row.Fecha}</td>
+                        <td class="border border-gray-300 px-4 py-2">${row["Día de la Semana"]}</td>
+                        <td class="border border-gray-300 px-4 py-2">${row["Horas Trabajadas"]}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+
+                document.getElementById("result").classList.remove("hidden");
+            } else {
+                alert("Hubo un problema procesando el archivo");
+            }
+        });
+    </script>
+
+</body>
+
+</html>
